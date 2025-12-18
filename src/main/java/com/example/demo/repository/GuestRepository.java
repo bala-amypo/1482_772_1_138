@@ -1,5 +1,7 @@
 package com.example.demo.repository;
 
-public class GuestRepository {
-    
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.demo.model.GuestEntity;
+
+public interface GuestRepository extends JpaRepository<GuestEntity, Long> {
 }
