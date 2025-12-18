@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
 import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
+
 import com.example.demo.model.GuestEntity;
 import com.example.demo.service.GuestService;
 
@@ -24,6 +26,3 @@ public class GuestController {
         return guestService.getAllGuests();
     }
 }
-
-
-
