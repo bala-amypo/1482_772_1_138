@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.model.RoomBooking;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.model.RoomBookingEntity;
 import com.example.demo.repository.RoomBookingRepository;
 
 @Service
@@ -17,17 +18,19 @@ public class RoomBookingServiceImpl implements RoomBookingService {
     }
 
     @Override
-    public RoomBooking createBooking(RoomBooking booking) {
-
-        if (booking.getCheckIn().isAfter(booking.getCheckOut())) {
-            throw new IllegalArgumentException("check-in must be before check-out");
-        }
-
+    public RoomBookingEntity createBooking(RoomBookingEntity booking) {
         return roomBookingRepository.save(booking);
     }
 
     @Override
-    public List<RoomBooking> getAllBookings() {
+    public List<RoomBookingEntity> getAllBookings() {
         return roomBookingRepository.findAll();
+    }
+
+    @Override
+    public RoomBookingEntity getBookingById(Long id) {
+        return roomBookingRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Room booking not found with id: " + id));
     }
 }
