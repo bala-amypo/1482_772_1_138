@@ -8,6 +8,7 @@ import com.example.demo.model.GuestEntity;
 import com.example.demo.service.GuestService;
 
 @RestController
+@RequestMapping("/guest")
 public class GuestController {
 
     private final GuestService guestService;
@@ -16,13 +17,21 @@ public class GuestController {
         this.guestService = guestService;
     }
 
-    @PostMapping("/addguest")
+    // ADD GUEST
+    @PostMapping("/add")
     public GuestEntity addGuest(@RequestBody GuestEntity guest) {
-        return guestService.createGuest(guest);
+        return guestService.addGuest(guest);
     }
 
-    @GetMapping("/showguests")
-    public List<GuestEntity> showGuests() {
+    // GET ALL GUESTS
+    @GetMapping("/all")
+    public List<GuestEntity> getAllGuests() {
         return guestService.getAllGuests();
+    }
+
+    // GET GUEST BY ID
+    @GetMapping("/{id}")
+    public GuestEntity getGuestById(@PathVariable Long id) {
+        return guestService.getGuestById(id);
     }
 }
