@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.GuestEntity;
 import com.example.demo.repository.GuestRepository;
 
@@ -18,13 +17,17 @@ public class GuestServiceImpl implements GuestService {
     }
 
     @Override
-    public GuestEntity addGuest(GuestEntity guest) {
+    public GuestEntity createGuest(GuestEntity guest) {
 
         // email must be unique
-        guestRepository.findByEmail(guest.getEmail())
-                .ifPresent(g -> {
-                    throw new RuntimeException("Email already exists");
-                });
+        if (guestRepository.existsByEmail(guest.getEmail())) {
+            throw new IllegalArgumentException("email already exists");
+        }
+
+        // default active = true
+        if (guest.getActive() == null) {
+            guest.setActive(true);
+        }
 
         return guestRepository.save(guest);
     }
@@ -32,12 +35,5 @@ public class GuestServiceImpl implements GuestService {
     @Override
     public List<GuestEntity> getAllGuests() {
         return guestRepository.findAll();
-    }
-
-    @Override
-    public GuestEntity getGuestById(Long id) {
-        return guestRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Guest not found with id: " + id));
     }
 }
