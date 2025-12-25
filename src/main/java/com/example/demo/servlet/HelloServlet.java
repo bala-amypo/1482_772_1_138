@@ -5,7 +5,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 
 @WebServlet(urlPatterns = "/hello-servlet")
@@ -15,7 +14,7 @@ public class HelloServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) {
-        this.message = "Hello Tomcat";
+        message = "Hello Tomcat";
     }
 
     public String getMessage() {
