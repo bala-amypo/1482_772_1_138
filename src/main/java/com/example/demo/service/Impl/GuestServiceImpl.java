@@ -17,16 +17,18 @@ public class GuestServiceImpl implements GuestService {
 
     @Override
     public Guest createGuest(Guest guest) {
+
         if (guestRepo.existsByEmail(guest.getEmail())) {
             throw new RuntimeException("Guest already exists with email: " + guest.getEmail());
         }
+
         guest.setActive(true);
         return guestRepo.save(guest);
     }
 
-    // 🔥 THIS FIXES YOUR CURRENT ERROR
     @Override
     public Guest updateGuest(Long id, Guest guest) {
+
         Guest existing = guestRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Guest not found with id: " + id));
 
@@ -58,6 +60,7 @@ public class GuestServiceImpl implements GuestService {
 
     @Override
     public void deactivateGuest(Long id) {
+
         Guest guest = guestRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Guest not found with id: " + id));
 

@@ -7,7 +7,7 @@ public interface GuestService {
 
     Guest createGuest(Guest guest);
 
-    Guest updateGuest(Long id, Guest guest);
+    Guest updateGuest(Long id, Guest guest);   // 🔥 ADD THIS
 
     List<Guest> getAllGuests();
 

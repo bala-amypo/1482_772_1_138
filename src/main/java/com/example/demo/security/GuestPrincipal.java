@@ -1,11 +1,13 @@
 package com.example.demo.security;
 
-import com.example.demo.entity.Guest;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.GrantedAuthority;
-
 import java.util.Collection;
 import java.util.Collections;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.example.demo.entity.Guest;
 
 public class GuestPrincipal implements UserDetails {
 
@@ -17,12 +19,14 @@ public class GuestPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        return Collections.singleton(
+                new SimpleGrantedAuthority("ROLE_" + guest.getRole()));
     }
 
     @Override
     public String getPassword() {
-        return "password";
+        // No password in your model
+        return null;
     }
 
     @Override
@@ -32,21 +36,21 @@ public class GuestPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return guest.getActive();
+        return guest.isActive();   // ✅ FIX
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return guest.getActive();
+        return guest.isActive();   // ✅ FIX
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return guest.getActive();
+        return guest.isActive();   // ✅ FIX
     }
 
     @Override
     public boolean isEnabled() {
-        return guest.getActive();
+        return guest.isActive();   // ✅ FIX
     }
 }
