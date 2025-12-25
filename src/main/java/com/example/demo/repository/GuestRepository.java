@@ -1,16 +1,10 @@
 package com.example.demo.repository;
 
-imppackort java.util.Optional;
-
+import com.example.demo.model.Guest;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.example.demo.entity.Guest;
+import java.util.Optional;
 
 public interface GuestRepository extends JpaRepository<Guest, Long> {
-
-    // already used earlier
-    boolean existsByEmail(String email);
-
-    // 🔥 REQUIRED FOR YOUR ERROR
     Optional<Guest> findByEmail(String email);
+    boolean existsByEmail(String email);
 }
