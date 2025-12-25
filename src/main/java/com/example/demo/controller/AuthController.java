@@ -1,51 +1,29 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.*;
-import com.example.demo.model.Guest;
-import com.example.demo.repository.GuestRepository;
-import com.example.demo.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import com.example.demo.entity.Guest;
+import com.example.demo.repository.GuestRepository;
 
 @RestController
-@RequestMapping("/auth")
 public class AuthController {
 
-    private final GuestRepository guestRepository;
-    private final JwtTokenProvider tokenProvider;
-
-    public AuthController(GuestRepository guestRepository,
-                          JwtTokenProvider tokenProvider) {
-        this.guestRepository = guestRepository;
-        this.tokenProvider = tokenProvider;
-    }
+    @Autowired
+    private GuestRepository guestRepository;
 
     @PostMapping("/register")
-    public Guest register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<String> register(@RequestBody Guest guest) {
 
-        if (guestRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+        // check email already exists
+        if (guestRepository.existsByEmail(guest.getEmail())) {
+            return ResponseEntity.badRequest().body("Email already exists");
         }
 
-        Guest g = new Guest();
-        g.setFullName(request.getFullName());
-        g.setEmail(request.getEmail());
-        g.setPhoneNumber(request.getPhoneNumber());
-        g.setVerified(true);
-
-        return guestRepository.save(g);
-    }
-
-    @PostMapping("/login")
-    public TokenResponse login(@RequestBody LoginRequest request) {
-
-        Authentication auth =
-            new UsernamePasswordAuthenticationToken(
-                request.getEmail(), request.getPassword());
-
-        String token = tokenProvider.generateToken(auth);
-        return new TokenResponse(token);
+        guestRepository.save(guest);
+        return ResponseEntity.ok("Guest registered successfully");
     }
 }
