@@ -1,17 +1,11 @@
-package com.example.demo.config;
+package com.example.demo.security;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider {
-
-    public boolean validateToken(String token) {
-        // Dummy validation for now
-        return token != null && !token.isEmpty();
-    }
-
-    public String getUsernameFromToken(String token) {
-        // Dummy extraction (replace with real JWT logic later)
-        return token;
+    public String generateToken(Authentication authentication) {
+        return "jwt-token";
     }
 }

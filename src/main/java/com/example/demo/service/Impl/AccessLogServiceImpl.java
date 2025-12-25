@@ -1,38 +1,43 @@
-package com.example.demo.service;
+package com.example.demo.service.impl;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.model.AccessLog;
+import com.example.demo.repository.*;
+import com.example.demo.service.AccessLogService;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.entity.AccessLog;
-import com.example.demo.repository.AccessLogRepository;
+import java.sql.Timestamp;
+import java.util.List;
 
 @Service
 public class AccessLogServiceImpl implements AccessLogService {
 
-    @Autowired
-    private AccessLogRepository repo;
+    private final AccessLogRepository accessLogRepository;
+    private final DigitalKeyRepository digitalKeyRepository;
+    private final GuestRepository guestRepository;
+    private final KeyShareRequestRepository keyShareRequestRepository;
 
-    @Override
-    public AccessLog addLog(AccessLog log) {
-        log.setAccessedAt(LocalDateTime.now());
-        return repo.save(log);
+    public AccessLogServiceImpl(
+            AccessLogRepository accessLogRepository,
+            DigitalKeyRepository digitalKeyRepository,
+            GuestRepository guestRepository,
+            KeyShareRequestRepository keyShareRequestRepository) {
+
+        this.accessLogRepository = accessLogRepository;
+        this.digitalKeyRepository = digitalKeyRepository;
+        this.guestRepository = guestRepository;
+        this.keyShareRequestRepository = keyShareRequestRepository;
     }
 
     @Override
-    public List<AccessLog> getAllLogs() {
-        return repo.findAll();
+    public List<AccessLog> getLogsForGuest(Long guestId) {
+        return accessLogRepository.findByGuestId(guestId);
     }
 
-    @Override
-    public List<AccessLog> getLogsByGuest(Long guestId) {
-        return repo.findByGuestId(guestId);
-    }
-
-    @Override
-    public List<AccessLog> getLogsByKey(Long keyId) {
-        return repo.findByDigitalKeyId(keyId);
+    public AccessLog createLog(AccessLog log) {
+        if (log.getAccessTime().after(new Timestamp(System.currentTimeMillis()))) {
+            throw new IllegalArgumentException("future");
+        }
+        log.setResult("SUCCESS");
+        return accessLogRepository.save(log);
     }
 }

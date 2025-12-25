@@ -1,8 +1,7 @@
-package com.example.demo.entity;
-
-import java.time.LocalDateTime;
+package com.example.demo.model;
 
 import jakarta.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 public class AccessLog {
@@ -17,46 +16,21 @@ public class AccessLog {
     @ManyToOne
     private Guest guest;
 
-    private LocalDateTime accessedAt;
-
-    private Boolean success;
+    private Timestamp accessTime;
+    private String result;
+    private String reason;
 
     public AccessLog() {}
 
-    // getters & setters
-    public Long getId() {
-        return id;
+    public Timestamp getAccessTime() {
+        return accessTime;
     }
 
-    public DigitalKey getDigitalKey() {
-        return digitalKey;
+    public void setAccessTime(Timestamp accessTime) {
+        this.accessTime = accessTime;
     }
 
-    public void setDigitalKey(DigitalKey digitalKey) {
-        this.digitalKey = digitalKey;
-    }
-
-    public Guest getGuest() {
-        return guest;
-    }
-
-    public void setGuest(Guest guest) {
-        this.guest = guest;
-    }
-
-    public LocalDateTime getAccessedAt() {
-        return accessedAt;
-    }
-
-    public void setAccessedAt(LocalDateTime accessedAt) {
-        this.accessedAt = accessedAt;
-    }
-
-    public Boolean getSuccess() {
-        return success;
-    }
-
-    public void setSuccess(Boolean success) {
-        this.success = success;
+    public void setResult(String result) {
+        this.result = result;
     }
 }
