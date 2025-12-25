@@ -1,7 +1,11 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Guest {
@@ -11,25 +15,20 @@ public class Guest {
     private Long id;
 
     private String fullName;
-
-    @Column(unique = true)
     private String email;
-
     private String phoneNumber;
-    private Boolean verified;
-    private Boolean active = true;
+
+    private boolean verified;
+    private boolean active;
+
     private String role;
-    private Timestamp createdAt;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public Guest() {
     }
 
-    @PrePersist
-    public void onCreate() {
-        createdAt = new Timestamp(System.currentTimeMillis());
-    }
-
-    // ===== GETTERS & SETTERS =====
+    // ---------- GETTERS & SETTERS ----------
 
     public Long getId() {
         return id;
@@ -63,19 +62,20 @@ public class Guest {
         this.phoneNumber = phoneNumber;
     }
 
-    public Boolean getVerified() {
+    // 🔥 IMPORTANT BOOLEAN GETTER
+    public boolean isVerified() {
         return verified;
     }
 
-    public void setVerified(Boolean verified) {
+    public void setVerified(boolean verified) {
         this.verified = verified;
     }
 
-    public Boolean getActive() {
+    public boolean isActive() {
         return active;
     }
 
-    public void setActive(Boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 
@@ -87,11 +87,11 @@ public class Guest {
         this.role = role;
     }
 
-    public Timestamp getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }
