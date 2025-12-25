@@ -1,6 +1,6 @@
 package com.example.demo.security;
 
-import com.example.demo.model.Guest;
+import com.example.demo.entity.Guest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
 

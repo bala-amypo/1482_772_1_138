@@ -1,6 +1,6 @@
 package com.example.demo.security;
 
-import com.example.demo.model.Guest;
+import com.example.demo.entity.Guest;
 import com.example.demo.repository.GuestRepository;
 import org.springframework.security.core.userdetails.*;
 
@@ -17,7 +17,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             throws UsernameNotFoundException {
 
         Guest guest = guestRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found"));
 
         return new GuestPrincipal(guest);
     }

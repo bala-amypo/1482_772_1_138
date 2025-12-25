@@ -9,8 +9,7 @@ import java.util.Base64;
 public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
-        // Simple token generation for test compatibility
-        String username = authentication.getName();
-        return Base64.getEncoder().encodeToString(username.getBytes());
+        return Base64.getEncoder()
+                .encodeToString(authentication.getName().getBytes());
     }
 }
