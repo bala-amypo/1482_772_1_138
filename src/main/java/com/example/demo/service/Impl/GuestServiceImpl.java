@@ -1,67 +1,63 @@
-package com.example.demo.service.Impl;
+package com.example.demo.service.impl;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.example.demo.entity.Guest;
+import com.example.demo.model.Guest;
 import com.example.demo.repository.GuestRepository;
 import com.example.demo.service.GuestService;
+import com.example.demo.exception.ResourceNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class GuestServiceImpl implements GuestService {
 
-    @Autowired
-    private GuestRepository guestRepo;
+    private final GuestRepository repository;
+    private final PasswordEncoder passwordEncoder;
+
+    public GuestServiceImpl(GuestRepository repository,
+                            PasswordEncoder passwordEncoder) {
+        this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public Guest createGuest(Guest guest) {
-        if (guestRepo.existsByEmail(guest.getEmail())) {
-            throw new RuntimeException("Guest already exists with email: " + guest.getEmail());
+        if (repository.existsByEmail(guest.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
         }
-        guest.setActive(true);
-        return guestRepo.save(guest);
+        if (guest.getPassword() != null) {
+            guest.setPassword(passwordEncoder.encode(guest.getPassword()));
+        }
+        return repository.save(guest);
     }
 
-    // 🔥 THIS FIXES YOUR CURRENT ERROR
     @Override
     public Guest updateGuest(Long id, Guest guest) {
-        Guest existing = guestRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Guest not found with id: " + id));
-
+        Guest existing = getGuestById(id);
         existing.setFullName(guest.getFullName());
-        existing.setEmail(guest.getEmail());
         existing.setPhoneNumber(guest.getPhoneNumber());
-        existing.setVerified(guest.isVerified());
+        existing.setVerified(guest.getVerified());
+        existing.setActive(guest.getActive());
         existing.setRole(guest.getRole());
-
-        return guestRepo.save(existing);
-    }
-
-    @Override
-    public List<Guest> getAllGuests() {
-        return guestRepo.findAll();
+        return repository.save(existing);
     }
 
     @Override
     public Guest getGuestById(Long id) {
-        return guestRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Guest not found with id: " + id));
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Guest not found"));
     }
 
     @Override
-    public Guest getGuestByEmail(String email) {
-        return guestRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Guest not found with email: " + email));
+    public List<Guest> getAllGuests() {
+        return repository.findAll();
     }
 
     @Override
     public void deactivateGuest(Long id) {
-        Guest guest = guestRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Guest not found with id: " + id));
-
+        Guest guest = getGuestById(id);
         guest.setActive(false);
-        guestRepo.save(guest);
+        repository.save(guest);
     }
 }

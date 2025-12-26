@@ -1,38 +1,38 @@
 package com.example.demo.controller;
 
-import java.util.List;
+import com.example.demo.model.DigitalKey;
+import com.example.demo.service.DigitalKeyService;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.entity.DigitalKey;
-import com.example.demo.service.DigitalKeyService;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/keys")
+@RequestMapping("/api/digital-keys")
 public class DigitalKeyController {
 
-    private final DigitalKeyService keyService;
+    private final DigitalKeyService service;
 
-    public DigitalKeyController(DigitalKeyService keyService) {
-        this.keyService = keyService;
+    public DigitalKeyController(DigitalKeyService service) {
+        this.service = service;
     }
 
     @PostMapping("/generate/{bookingId}")
-    public DigitalKey generateKey(@PathVariable Long bookingId) {
-        return keyService.generateKey(bookingId);
+    public DigitalKey generate(@PathVariable Long bookingId) {
+        return service.generateKey(bookingId);
     }
 
     @GetMapping("/{id}")
-    public DigitalKey getKey(@PathVariable Long id) {
-        return keyService.getKeyById(id);
+    public DigitalKey get(@PathVariable Long id) {
+        return service.getKeyById(id);
+    }
+
+    @GetMapping("/booking/{bookingId}")
+    public DigitalKey active(@PathVariable Long bookingId) {
+        return service.getActiveKeyForBooking(bookingId);
     }
 
     @GetMapping("/guest/{guestId}")
-    public List<DigitalKey> getKeysByGuest(@PathVariable Long guestId) {
-        return keyService.getKeysByGuestId(guestId);
-    }
-
-    @PutMapping("/{id}/deactivate")
-    public void deactivateKey(@PathVariable Long id) {
-        keyService.deactivateKey(id);
+    public List<DigitalKey> byGuest(@PathVariable Long guestId) {
+        return service.getKeysForGuest(guestId);
     }
 }

@@ -1,48 +1,44 @@
 package com.example.demo.controller;
 
-import java.util.List;
-import org.springframework.web.bind.annotation.*;
-import com.example.demo.entity.RoomBooking;
+import com.example.demo.model.RoomBooking;
 import com.example.demo.service.RoomBookingService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/bookings")
 public class RoomBookingController {
 
-    private final RoomBookingService bookingService;
+    private final RoomBookingService service;
 
-    public RoomBookingController(RoomBookingService bookingService) {
-        this.bookingService = bookingService;
+    public RoomBookingController(RoomBookingService service) {
+        this.service = service;
     }
 
     @PostMapping
-    public RoomBooking createBooking(@RequestBody RoomBooking booking) {
-        return bookingService.createBooking(booking);
-    }
-
-    @GetMapping("/{id}")
-    public RoomBooking getBooking(@PathVariable Long id) {
-        return bookingService.getBookingById(id);
-    }
-
-    @GetMapping
-    public List<RoomBooking> getAllBookings() {
-        return bookingService.getAllBookings();
-    }
-
-    @GetMapping("/guest/{guestId}")
-    public List<RoomBooking> getBookingsByGuest(@PathVariable Long guestId) {
-        return bookingService.getBookingsByGuestId(guestId);
+    public RoomBooking create(@RequestBody RoomBooking booking) {
+        return service.createBooking(booking);
     }
 
     @PutMapping("/{id}")
-    public RoomBooking updateBooking(@PathVariable Long id,
-                                     @RequestBody RoomBooking booking) {
-        return bookingService.updateBooking(id, booking);
+    public RoomBooking update(@PathVariable Long id,
+                              @RequestBody RoomBooking booking) {
+        return service.updateBooking(id, booking);
     }
 
-    @PutMapping("/{id}/cancel")
-    public void cancelBooking(@PathVariable Long id) {
-        bookingService.cancelBooking(id);
+    @GetMapping("/{id}")
+    public RoomBooking get(@PathVariable Long id) {
+        return service.getBookingById(id);
+    }
+
+    @GetMapping("/guest/{guestId}")
+    public List<RoomBooking> byGuest(@PathVariable Long guestId) {
+        return service.getBookingsForGuest(guestId);
+    }
+
+    @PutMapping("/{id}/deactivate")
+    public void deactivate(@PathVariable Long id) {
+        service.deactivateBooking(id);
     }
 }

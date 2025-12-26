@@ -1,38 +1,44 @@
 package com.example.demo.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.model.KeyShareRequest;
+import com.example.demo.service.KeyShareRequestService;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.entity.KeyShareRequest;
-import com.example.demo.service.KeyShareRequestService;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/key-share")
-@CrossOrigin
 public class KeyShareRequestController {
 
-    @Autowired
-    private KeyShareRequestService service;
+    private final KeyShareRequestService service;
 
-    @PostMapping("/request")
+    public KeyShareRequestController(KeyShareRequestService service) {
+        this.service = service;
+    }
+
+    @PostMapping
     public KeyShareRequest create(@RequestBody KeyShareRequest request) {
-        return service.createRequest(request);
+        return service.createShareRequest(request);
     }
 
-    @GetMapping("/all")
-    public List<KeyShareRequest> getAll() {
-        return service.getAllRequests();
+    @PutMapping("/{id}/status")
+    public KeyShareRequest updateStatus(@PathVariable Long id,
+                                        @RequestParam String status) {
+        return service.updateStatus(id, status);
     }
 
-    @PutMapping("/{id}/approve")
-    public KeyShareRequest approve(@PathVariable Long id) {
-        return service.approveRequest(id);
+    @GetMapping("/{id}")
+    public KeyShareRequest get(@PathVariable Long id) {
+        return service.getShareRequestById(id);
     }
 
-    @PutMapping("/{id}/reject")
-    public KeyShareRequest reject(@PathVariable Long id) {
-        return service.rejectRequest(id);
+    @GetMapping("/shared-by/{guestId}")
+    public List<KeyShareRequest> sharedBy(@PathVariable Long guestId) {
+        return service.getRequestsSharedBy(guestId);
+    }
+
+    @GetMapping("/shared-with/{guestId}")
+    public List<KeyShareRequest> sharedWith(@PathVariable Long guestId) {
+        return service.getRequestsSharedWith(guestId);
     }
 }

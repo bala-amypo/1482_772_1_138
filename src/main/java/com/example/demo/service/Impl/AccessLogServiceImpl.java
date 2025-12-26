@@ -1,7 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.model.AccessLog;
-import com.example.demo.repository.*;
+import com.example.demo.repository.AccessLogRepository;
 import com.example.demo.service.AccessLogService;
 import org.springframework.stereotype.Service;
 
@@ -11,33 +11,29 @@ import java.util.List;
 @Service
 public class AccessLogServiceImpl implements AccessLogService {
 
-    private final AccessLogRepository accessLogRepository;
-    private final DigitalKeyRepository digitalKeyRepository;
-    private final GuestRepository guestRepository;
-    private final KeyShareRequestRepository keyShareRequestRepository;
+    private final AccessLogRepository repository;
 
-    public AccessLogServiceImpl(
-            AccessLogRepository accessLogRepository,
-            DigitalKeyRepository digitalKeyRepository,
-            GuestRepository guestRepository,
-            KeyShareRequestRepository keyShareRequestRepository) {
+    public AccessLogServiceImpl(AccessLogRepository repository) {
+        this.repository = repository;
+    }
 
-        this.accessLogRepository = accessLogRepository;
-        this.digitalKeyRepository = digitalKeyRepository;
-        this.guestRepository = guestRepository;
-        this.keyShareRequestRepository = keyShareRequestRepository;
+    @Override
+    public AccessLog createLog(AccessLog log) {
+        if (log.getAccessTime().after(new Timestamp(System.currentTimeMillis()))) {
+            throw new IllegalArgumentException("future access not allowed");
+        }
+        log.setResult("SUCCESS");
+        log.setReason("Access granted");
+        return repository.save(log);
+    }
+
+    @Override
+    public List<AccessLog> getLogsForKey(Long keyId) {
+        return repository.findByDigitalKeyId(keyId);
     }
 
     @Override
     public List<AccessLog> getLogsForGuest(Long guestId) {
-        return accessLogRepository.findByGuestId(guestId);
-    }
-
-    public AccessLog createLog(AccessLog log) {
-        if (log.getAccessTime().after(new Timestamp(System.currentTimeMillis()))) {
-            throw new IllegalArgumentException("future");
-        }
-        log.setResult("SUCCESS");
-        return accessLogRepository.save(log);
+        return repository.findByGuestId(guestId);
     }
 }
