@@ -1,18 +1,13 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-
-import java.sql.Timestamp;
+import jakarta.persistence.*;
+import java.time.Instant;
 
 @Entity
 public class AccessLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
     @ManyToOne
@@ -21,53 +16,21 @@ public class AccessLog {
     @ManyToOne
     private Guest guest;
 
-    private Timestamp accessTime;
+    private Instant accessTime;
     private String result;
-    private String reason;
 
-    // ---------- Getters & Setters ----------
+    // getters setters
+    public Long getId() { return id; }
 
-    public Long getId() {
-        return id;
-    }
+    public DigitalKey getDigitalKey() { return digitalKey; }
+    public void setDigitalKey(DigitalKey digitalKey) { this.digitalKey = digitalKey; }
 
-    public DigitalKey getDigitalKey() {
-        return digitalKey;
-    }
+    public Guest getGuest() { return guest; }
+    public void setGuest(Guest guest) { this.guest = guest; }
 
-    public void setDigitalKey(DigitalKey digitalKey) {
-        this.digitalKey = digitalKey;
-    }
+    public Instant getAccessTime() { return accessTime; }
+    public void setAccessTime(Instant accessTime) { this.accessTime = accessTime; }
 
-    public Guest getGuest() {
-        return guest;
-    }
-
-    public void setGuest(Guest guest) {
-        this.guest = guest;
-    }
-
-    public Timestamp getAccessTime() {
-        return accessTime;
-    }
-
-    public void setAccessTime(Timestamp accessTime) {
-        this.accessTime = accessTime;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
+    public String getResult() { return result; }
+    public void setResult(String result) { this.result = result; }
 }

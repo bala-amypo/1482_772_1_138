@@ -1,75 +1,39 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-
-import java.sql.Timestamp;
+import jakarta.persistence.*;
+import java.time.Instant;
 
 @Entity
 public class DigitalKey {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
+
+    private String keyValue;
+    private Instant issuedAt;
+    private Instant expiresAt;
+    private Boolean active = true;
 
     @ManyToOne
     private RoomBooking booking;
 
-    private String keyValue;
-    private Timestamp issuedAt;
-    private Timestamp expiresAt;
-    private Boolean active = true;
+    // getters setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    // ---------- Getters & Setters ----------
+    public String getKeyValue() { return keyValue; }
+    public void setKeyValue(String keyValue) { this.keyValue = keyValue; }
 
-    public Long getId() {
-        return id;
-    }
+    public Instant getIssuedAt() { return issuedAt; }
+    public void setIssuedAt(Instant issuedAt) { this.issuedAt = issuedAt; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Instant getExpiresAt() { return expiresAt; }
+    public void setExpiresAt(Instant expiresAt) { this.expiresAt = expiresAt; }
 
-    public RoomBooking getBooking() {
-        return booking;
-    }
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
 
-    public void setBooking(RoomBooking booking) {
-        this.booking = booking;
-    }
-
-    public String getKeyValue() {
-        return keyValue;
-    }
-
-    public void setKeyValue(String keyValue) {
-        this.keyValue = keyValue;
-    }
-
-    public Timestamp getIssuedAt() {
-        return issuedAt;
-    }
-
-    public void setIssuedAt(Timestamp issuedAt) {
-        this.issuedAt = issuedAt;
-    }
-
-    public Timestamp getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(Timestamp expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
+    public RoomBooking getBooking() { return booking; }
+    public void setBooking(RoomBooking booking) { this.booking = booking; }
 }

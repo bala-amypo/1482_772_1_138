@@ -7,9 +7,7 @@ import java.util.List;
 
 public interface KeyShareRequestRepository extends JpaRepository<KeyShareRequest, Long> {
 
-    // REQUIRED exact method name
     List<KeyShareRequest> findBySharedById(Long guestId);
 
-    // REQUIRED exact method name
     List<KeyShareRequest> findBySharedWithId(Long guestId);
 }

@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface DigitalKeyRepository extends JpaRepository<DigitalKey, Long> {
 
-    // REQUIRED exact method name
     Optional<DigitalKey> findByBookingIdAndActiveTrue(Long bookingId);
 
-    // REQUIRED exact method name
     List<DigitalKey> findByBookingGuestId(Long guestId);
+
+    Optional<DigitalKey> findByKeyValue(String keyValue);
 }

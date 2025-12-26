@@ -7,6 +7,5 @@ import java.util.List;
 
 public interface RoomBookingRepository extends JpaRepository<RoomBooking, Long> {
 
-    // REQUIRED exact method name
     List<RoomBooking> findByGuestId(Long guestId);
 }
