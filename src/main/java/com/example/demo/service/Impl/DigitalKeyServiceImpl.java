@@ -1,44 +1,61 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.model.*;
-import com.example.demo.repository.*;
+import com.example.demo.model.DigitalKey;
+import com.example.demo.model.RoomBooking;
+import com.example.demo.repository.DigitalKeyRepository;
+import com.example.demo.repository.RoomBookingRepository;
 import com.example.demo.service.DigitalKeyService;
+import org.springframework.stereotype.Service;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Service   // ✅ THIS WAS MISSING
 public class DigitalKeyServiceImpl implements DigitalKeyService {
 
-    private final DigitalKeyRepository repo;
-    private final RoomBookingRepository bookingRepo;
+    private final DigitalKeyRepository digitalKeyRepository;
+    private final RoomBookingRepository roomBookingRepository;
 
-    public DigitalKeyServiceImpl(DigitalKeyRepository repo, RoomBookingRepository bookingRepo) {
-        this.repo = repo;
-        this.bookingRepo = bookingRepo;
+    public DigitalKeyServiceImpl(
+            DigitalKeyRepository digitalKeyRepository,
+            RoomBookingRepository roomBookingRepository) {
+
+        this.digitalKeyRepository = digitalKeyRepository;
+        this.roomBookingRepository = roomBookingRepository;
     }
 
+    @Override
     public DigitalKey generateKey(Long bookingId) {
-        RoomBooking b = bookingRepo.findById(bookingId)
-                .orElseThrow(() -> new ResourceNotFoundException("Booking " + bookingId));
 
-        if (!b.getActive())
+        RoomBooking booking = roomBookingRepository.findById(bookingId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Booking not found " + bookingId));
+
+        if (!Boolean.TRUE.equals(booking.getActive())) {
             throw new IllegalStateException("inactive booking");
+        }
 
-        DigitalKey k = new DigitalKey();
-        k.setBooking(b);
-        k.setKeyValue(UUID.randomUUID().toString());
-        k.setIssuedAt(Instant.now());
-        k.setExpiresAt(Instant.now().plusSeconds(3600));
-        return repo.save(k);
+        DigitalKey key = new DigitalKey();
+        key.setBooking(booking);
+        key.setKeyValue(UUID.randomUUID().toString());
+        key.setIssuedAt(Instant.now());
+        key.setExpiresAt(Instant.now().plusSeconds(3600));
+        key.setActive(true);
+
+        return digitalKeyRepository.save(key);
     }
 
-    public DigitalKey getActiveKeyForBooking(Long id) {
-        return repo.findByBookingIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Key " + id));
+    @Override
+    public DigitalKey getActiveKeyForBooking(Long bookingId) {
+        return digitalKeyRepository.findByBookingIdAndActiveTrue(bookingId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Key not found " + bookingId));
     }
 
+    @Override
     public List<DigitalKey> getKeysForGuest(Long guestId) {
-        return repo.findByBookingGuestId(guestId);
+        return digitalKeyRepository.findByBookingGuestId(guestId);
     }
 }

@@ -2,21 +2,27 @@ package com.example.demo.security;
 
 import io.jsonwebtoken.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+
 import java.util.Date;
 
+@Component   // ✅ ADD THIS
 public class JwtTokenProvider {
 
-    private final String secret = "testsecret";
-    private final long validity = 3600000;
+    private final String secret = "test-secret-key";
+    private final long validityMs = 3600000;
 
-    public String generateToken(Authentication auth) {
-        GuestPrincipal p = (GuestPrincipal) auth.getPrincipal();
+    public String generateToken(Authentication authentication) {
+
+        GuestPrincipal principal =
+                (GuestPrincipal) authentication.getPrincipal();
+
         return Jwts.builder()
-                .setSubject(p.getUsername())
-                .claim("userId", p.getId())
-                .claim("role", p.getRole())
+                .setSubject(principal.getUsername())
+                .claim("userId", principal.getId())
+                .claim("role", principal.getRole())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + validity))
+                .setExpiration(new Date(System.currentTimeMillis() + validityMs))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
@@ -32,16 +38,22 @@ public class JwtTokenProvider {
 
     public Long getUserIdFromToken(String token) {
         return Jwts.parser().setSigningKey(secret)
-                .parseClaimsJws(token).getBody().get("userId", Long.class);
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userId", Long.class);
     }
 
     public String getEmailFromToken(String token) {
         return Jwts.parser().setSigningKey(secret)
-                .parseClaimsJws(token).getBody().getSubject();
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
     public String getRoleFromToken(String token) {
         return Jwts.parser().setSigningKey(secret)
-                .parseClaimsJws(token).getBody().get("role", String.class);
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
     }
 }
