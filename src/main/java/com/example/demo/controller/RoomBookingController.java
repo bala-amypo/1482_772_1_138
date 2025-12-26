@@ -21,20 +21,19 @@ public class RoomBookingController {
         return service.createBooking(booking);
     }
 
-    @PutMapping("/{id}")
-    public RoomBooking update(@PathVariable Long id,
-                              @RequestBody RoomBooking booking) {
-        return service.updateBooking(id, booking);
-    }
-
     @GetMapping("/{id}")
     public RoomBooking get(@PathVariable Long id) {
         return service.getBookingById(id);
     }
 
     @GetMapping("/guest/{guestId}")
-    public List<RoomBooking> byGuest(@PathVariable Long guestId) {
+    public List<RoomBooking> getForGuest(@PathVariable Long guestId) {
         return service.getBookingsForGuest(guestId);
+    }
+
+    @PutMapping("/{id}")
+    public RoomBooking update(@PathVariable Long id, @RequestBody RoomBooking booking) {
+        return service.updateBooking(id, booking);
     }
 
     @PutMapping("/{id}/deactivate")
