@@ -1,39 +1,42 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.AccessLog;
-import com.example.demo.repository.AccessLogRepository;
+import com.example.demo.model.*;
+import com.example.demo.repository.*;
 import com.example.demo.service.AccessLogService;
-import org.springframework.stereotype.Service;
-
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
-@Service
 public class AccessLogServiceImpl implements AccessLogService {
 
-    private final AccessLogRepository repository;
+    private final AccessLogRepository repo;
+    private final DigitalKeyRepository keyRepo;
+    private final GuestRepository guestRepo;
+    private final KeyShareRequestRepository shareRepo;
 
-    public AccessLogServiceImpl(AccessLogRepository repository) {
-        this.repository = repository;
+    public AccessLogServiceImpl(AccessLogRepository repo,
+                                DigitalKeyRepository keyRepo,
+                                GuestRepository guestRepo,
+                                KeyShareRequestRepository shareRepo) {
+        this.repo = repo;
+        this.keyRepo = keyRepo;
+        this.guestRepo = guestRepo;
+        this.shareRepo = shareRepo;
     }
 
-    @Override
     public AccessLog createLog(AccessLog log) {
-        if (log.getAccessTime().after(new Timestamp(System.currentTimeMillis()))) {
-            throw new IllegalArgumentException("future access not allowed");
-        }
-        log.setResult("SUCCESS");
-        log.setReason("Access granted");
-        return repository.save(log);
+        if (log.getAccessTime().isAfter(Instant.now()))
+            throw new IllegalArgumentException("future");
+
+        DigitalKey key = keyRepo.findById(log.getDigitalKey().getId()).orElseThrow();
+        log.setResult(key.getActive() ? "SUCCESS" : "DENIED");
+        return repo.save(log);
     }
 
-    @Override
-    public List<AccessLog> getLogsForKey(Long keyId) {
-        return repository.findByDigitalKeyId(keyId);
+    public List<AccessLog> getLogsForGuest(Long id) {
+        return repo.findByGuestId(id);
     }
 
-    @Override
-    public List<AccessLog> getLogsForGuest(Long guestId) {
-        return repository.findByGuestId(guestId);
+    public List<AccessLog> getLogsForKey(Long id) {
+        return repo.findByDigitalKeyId(id);
     }
 }
