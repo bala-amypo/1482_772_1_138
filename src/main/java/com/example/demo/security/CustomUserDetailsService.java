@@ -1,67 +1,33 @@
 package com.example.demo.security;
 
-import org.springframework.security.core.GrantedAuthority;
+import com.example.demo.model.Guest;
+import com.example.demo.repository.GuestRepository;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
 
-public class CustomUserDetails implements UserDetails {
+    private final GuestRepository guestRepository;
 
-    private final Long id;
-    private final String email;
-    private final String password;
-    private final String role;
-
-    public CustomUserDetails(Long id, String email, String password, String role) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
-    // ================= CUSTOM FIELD =================
-    public Long getId() {
-        return id;
-    }
-
-    // ================= USERDETAILS METHODS =================
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(() -> role);
+    public CustomUserDetailsService(GuestRepository guestRepository) {
+        this.guestRepository = guestRepository;
     }
 
     @Override
-    public String getPassword() {
-        return password;
-    }
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
+        Guest guest = guestRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found with email: " + email));
 
-    // ================= ACCOUNT STATUS =================
-    // IMPORTANT: all MUST return true for tests to pass
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+        return new CustomUserDetails(
+                guest.getId(),
+                guest.getEmail(),
+                guest.getPassword(),
+                guest.getRole()
+        );
     }
 }
