@@ -17,22 +17,17 @@ public class DigitalKeyController {
     }
 
     @PostMapping("/generate/{bookingId}")
-    public DigitalKey generate(@PathVariable Long bookingId) {
+    public DigitalKey generateKey(@PathVariable Long bookingId) {
         return service.generateKey(bookingId);
     }
 
-    @GetMapping("/{id}")
-    public DigitalKey get(@PathVariable Long id) {
-        return service.getKeyById(id);
-    }
-
     @GetMapping("/booking/{bookingId}")
-    public DigitalKey active(@PathVariable Long bookingId) {
+    public DigitalKey getActiveKeyForBooking(@PathVariable Long bookingId) {
         return service.getActiveKeyForBooking(bookingId);
     }
 
     @GetMapping("/guest/{guestId}")
-    public List<DigitalKey> byGuest(@PathVariable Long guestId) {
+    public List<DigitalKey> getKeysForGuest(@PathVariable Long guestId) {
         return service.getKeysForGuest(guestId);
     }
 }

@@ -22,23 +22,24 @@ public class KeyShareRequestController {
     }
 
     @PutMapping("/{id}/status")
-    public KeyShareRequest updateStatus(@PathVariable Long id,
-                                        @RequestParam String status) {
+    public KeyShareRequest updateStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
         return service.updateStatus(id, status);
     }
 
     @GetMapping("/{id}")
-    public KeyShareRequest get(@PathVariable Long id) {
+    public KeyShareRequest getById(@PathVariable Long id) {
         return service.getShareRequestById(id);
     }
 
     @GetMapping("/shared-by/{guestId}")
-    public List<KeyShareRequest> sharedBy(@PathVariable Long guestId) {
+    public List<KeyShareRequest> getSharedBy(@PathVariable Long guestId) {
         return service.getRequestsSharedBy(guestId);
     }
 
     @GetMapping("/shared-with/{guestId}")
-    public List<KeyShareRequest> sharedWith(@PathVariable Long guestId) {
+    public List<KeyShareRequest> getSharedWith(@PathVariable Long guestId) {
         return service.getRequestsSharedWith(guestId);
     }
 }

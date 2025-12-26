@@ -21,13 +21,13 @@ public class AccessLogController {
         return service.createLog(log);
     }
 
-    @GetMapping("/key/{keyId}")
-    public List<AccessLog> byKey(@PathVariable Long keyId) {
-        return service.getLogsForKey(keyId);
+    @GetMapping("/guest/{guestId}")
+    public List<AccessLog> getLogsForGuest(@PathVariable Long guestId) {
+        return service.getLogsForGuest(guestId);
     }
 
-    @GetMapping("/guest/{guestId}")
-    public List<AccessLog> byGuest(@PathVariable Long guestId) {
-        return service.getLogsForGuest(guestId);
+    @GetMapping("/key/{keyId}")
+    public List<AccessLog> getLogsForKey(@PathVariable Long keyId) {
+        return service.getLogsForKey(keyId);
     }
 }
