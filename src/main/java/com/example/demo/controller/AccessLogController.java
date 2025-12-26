@@ -1,38 +1,33 @@
 package com.example.demo.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.model.AccessLog;
+import com.example.demo.service.AccessLogService;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.entity.AccessLog;
-import com.example.demo.service.AccessLogService;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/access-log")
-@CrossOrigin
+@RequestMapping("/api/access-logs")
 public class AccessLogController {
 
-    @Autowired
-    private AccessLogService service;
+    private final AccessLogService service;
 
-    @PostMapping("/add")
-    public AccessLog addLog(@RequestBody AccessLog log) {
-        return service.addLog(log);
+    public AccessLogController(AccessLogService service) {
+        this.service = service;
     }
 
-    @GetMapping("/all")
-    public List<AccessLog> getAllLogs() {
-        return service.getAllLogs();
-    }
-
-    @GetMapping("/guest/{guestId}")
-    public List<AccessLog> getLogsByGuest(@PathVariable Long guestId) {
-        return service.getLogsByGuest(guestId);
+    @PostMapping
+    public AccessLog create(@RequestBody AccessLog log) {
+        return service.createLog(log);
     }
 
     @GetMapping("/key/{keyId}")
-    public List<AccessLog> getLogsByKey(@PathVariable Long keyId) {
-        return service.getLogsByKey(keyId);
+    public List<AccessLog> byKey(@PathVariable Long keyId) {
+        return service.getLogsForKey(keyId);
+    }
+
+    @GetMapping("/guest/{guestId}")
+    public List<AccessLog> byGuest(@PathVariable Long guestId) {
+        return service.getLogsForGuest(guestId);
     }
 }
