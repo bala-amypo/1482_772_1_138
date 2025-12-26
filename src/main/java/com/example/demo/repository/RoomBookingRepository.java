@@ -1,10 +1,12 @@
 package com.example.demo.repository;
 
-import java.util.List;
+import com.example.demo.model.RoomBooking;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.example.demo.entity.RoomBooking;
+
+import java.util.List;
 
 public interface RoomBookingRepository extends JpaRepository<RoomBooking, Long> {
 
+    // REQUIRED exact method name
     List<RoomBooking> findByGuestId(Long guestId);
 }

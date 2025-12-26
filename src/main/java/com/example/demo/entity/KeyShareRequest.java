@@ -1,8 +1,13 @@
-package com.example.demo.entity;
+package com.example.demo.model;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 
-import jakarta.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 public class KeyShareRequest {
@@ -15,18 +20,22 @@ public class KeyShareRequest {
     private DigitalKey digitalKey;
 
     @ManyToOne
-    private Guest requester;
+    private Guest sharedBy;
 
     @ManyToOne
-    private Guest targetGuest;
+    private Guest sharedWith;
 
-    private String status; // PENDING, APPROVED, REJECTED
+    private Timestamp shareStart;
+    private Timestamp shareEnd;
+    private String status = "PENDING";
+    private Timestamp createdAt;
 
-    private LocalDateTime requestedAt;
+    @PrePersist
+    void create() {
+        createdAt = new Timestamp(System.currentTimeMillis());
+    }
 
-    public KeyShareRequest() {}
-
-    // getters & setters
+    // ---------- Getters & Setters ----------
 
     public Long getId() {
         return id;
@@ -40,20 +49,36 @@ public class KeyShareRequest {
         this.digitalKey = digitalKey;
     }
 
-    public Guest getRequester() {
-        return requester;
+    public Guest getSharedBy() {
+        return sharedBy;
     }
 
-    public void setRequester(Guest requester) {
-        this.requester = requester;
+    public void setSharedBy(Guest sharedBy) {
+        this.sharedBy = sharedBy;
     }
 
-    public Guest getTargetGuest() {
-        return targetGuest;
+    public Guest getSharedWith() {
+        return sharedWith;
     }
 
-    public void setTargetGuest(Guest targetGuest) {
-        this.targetGuest = targetGuest;
+    public void setSharedWith(Guest sharedWith) {
+        this.sharedWith = sharedWith;
+    }
+
+    public Timestamp getShareStart() {
+        return shareStart;
+    }
+
+    public void setShareStart(Timestamp shareStart) {
+        this.shareStart = shareStart;
+    }
+
+    public Timestamp getShareEnd() {
+        return shareEnd;
+    }
+
+    public void setShareEnd(Timestamp shareEnd) {
+        this.shareEnd = shareEnd;
     }
 
     public String getStatus() {
@@ -64,11 +89,7 @@ public class KeyShareRequest {
         this.status = status;
     }
 
-    public LocalDateTime getRequestedAt() {
-        return requestedAt;
-    }
-
-    public void setRequestedAt(LocalDateTime requestedAt) {
-        this.requestedAt = requestedAt;
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 }

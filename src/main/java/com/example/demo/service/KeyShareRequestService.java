@@ -1,15 +1,17 @@
 package com.example.demo.service;
 
+import com.example.demo.model.KeyShareRequest;
 import java.util.List;
-import com.example.demo.entity.KeyShareRequest;
 
 public interface KeyShareRequestService {
 
-    KeyShareRequest createRequest(KeyShareRequest request);
+    KeyShareRequest createShareRequest(KeyShareRequest request);
 
-    List<KeyShareRequest> getAllRequests();
+    KeyShareRequest updateStatus(Long requestId, String status);
 
-    KeyShareRequest approveRequest(Long id);
+    KeyShareRequest getShareRequestById(Long id);
 
-    KeyShareRequest rejectRequest(Long id);
+    List<KeyShareRequest> getRequestsSharedBy(Long guestId);
+
+    List<KeyShareRequest> getRequestsSharedWith(Long guestId);
 }
