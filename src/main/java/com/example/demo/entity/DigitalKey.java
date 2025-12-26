@@ -1,6 +1,11 @@
-package com.example.demo.entity;
+package com.example.demo.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+
 import java.sql.Timestamp;
 
 @Entity
@@ -13,17 +18,12 @@ public class DigitalKey {
     @ManyToOne
     private RoomBooking booking;
 
-    @Column(unique = true)
     private String keyValue;
-
     private Timestamp issuedAt;
     private Timestamp expiresAt;
     private Boolean active = true;
 
-    public DigitalKey() {
-    }
-
-    // getters & setters
+    // ---------- Getters & Setters ----------
 
     public Long getId() {
         return id;
