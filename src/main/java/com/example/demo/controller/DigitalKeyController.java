@@ -2,32 +2,48 @@ package com.example.demo.controller;
 
 import com.example.demo.model.DigitalKey;
 import com.example.demo.service.DigitalKeyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/digital-keys")
+@SecurityRequirement(name = "bearerAuth")
+
 public class DigitalKeyController {
 
-    private final DigitalKeyService service;
+    @Autowired
+    private DigitalKeyService digitalKeyService;
 
-    public DigitalKeyController(DigitalKeyService service) {
-        this.service = service;
-    }
-
+ 
     @PostMapping("/generate/{bookingId}")
-    public DigitalKey generateKey(@PathVariable Long bookingId) {
-        return service.generateKey(bookingId);
+    public ResponseEntity<DigitalKey> generateKey(@PathVariable Long bookingId) {
+        DigitalKey newKey = digitalKeyService.generateKey(bookingId); //
+        return ResponseEntity.ok(newKey);
     }
 
+  
+    @GetMapping("/{id}")
+    public ResponseEntity<DigitalKey> getKey(@PathVariable Long id) {
+        DigitalKey key = digitalKeyService.getKeyById(id); //
+        return ResponseEntity.ok(key);
+    }
+
+   
     @GetMapping("/booking/{bookingId}")
-    public DigitalKey getActiveKeyForBooking(@PathVariable Long bookingId) {
-        return service.getActiveKeyForBooking(bookingId);
+    public ResponseEntity<DigitalKey> getActiveKey(@PathVariable Long bookingId) {
+        DigitalKey activeKey = digitalKeyService.getActiveKeyForBooking(bookingId); //
+        return ResponseEntity.ok(activeKey);
     }
 
+  
     @GetMapping("/guest/{guestId}")
-    public List<DigitalKey> getKeysForGuest(@PathVariable Long guestId) {
-        return service.getKeysForGuest(guestId);
+    public ResponseEntity<List<DigitalKey>> getKeysForGuest(@PathVariable Long guestId) {
+        List<DigitalKey> keys = digitalKeyService.getKeysForGuest(guestId); //
+        return ResponseEntity.ok(keys);
     }
 }
