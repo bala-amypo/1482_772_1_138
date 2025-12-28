@@ -7,7 +7,7 @@ import java.time.Instant;
 public class AccessLog {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -17,10 +17,15 @@ public class AccessLog {
     private Guest guest;
 
     private Instant accessTime;
+
     private String result;
 
-    // getters setters
+    private String reason;
+
+    /* ========= getters & setters ========= */
+
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public DigitalKey getDigitalKey() { return digitalKey; }
     public void setDigitalKey(DigitalKey digitalKey) { this.digitalKey = digitalKey; }
@@ -33,4 +38,7 @@ public class AccessLog {
 
     public String getResult() { return result; }
     public void setResult(String result) { this.result = result; }
+
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
 }
