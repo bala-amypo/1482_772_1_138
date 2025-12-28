@@ -9,21 +9,30 @@ import java.util.Set;
 public class RoomBooking {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String roomNumber;
+
     private LocalDate checkInDate;
+
     private LocalDate checkOutDate;
+
     private Boolean active = true;
 
     @ManyToOne
     private Guest guest;
 
     @ManyToMany
+    @JoinTable(
+        name = "booking_roommates",
+        joinColumns = @JoinColumn(name = "booking_id"),
+        inverseJoinColumns = @JoinColumn(name = "guest_id")
+    )
     private Set<Guest> roommates = new HashSet<>();
 
-    // getters setters
+    /* ========= getters & setters ========= */
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -43,4 +52,5 @@ public class RoomBooking {
     public void setGuest(Guest guest) { this.guest = guest; }
 
     public Set<Guest> getRoommates() { return roommates; }
+    public void setRoommates(Set<Guest> roommates) { this.roommates = roommates; }
 }

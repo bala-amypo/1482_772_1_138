@@ -7,7 +7,7 @@ import java.time.Instant;
 public class KeyShareRequest {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -20,11 +20,13 @@ public class KeyShareRequest {
     private Guest sharedWith;
 
     private Instant shareStart;
-    private Instant shareEnd;
-    private String status = "PENDING";
 
-    // getters setters
+    private Instant shareEnd;
+
+    /* ========= getters & setters ========= */
+
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public DigitalKey getDigitalKey() { return digitalKey; }
     public void setDigitalKey(DigitalKey digitalKey) { this.digitalKey = digitalKey; }
@@ -40,7 +42,4 @@ public class KeyShareRequest {
 
     public Instant getShareEnd() { return shareEnd; }
     public void setShareEnd(Instant shareEnd) { this.shareEnd = shareEnd; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
 }

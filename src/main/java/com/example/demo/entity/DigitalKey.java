@@ -7,18 +7,22 @@ import java.time.Instant;
 public class DigitalKey {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String keyValue;
+
     private Instant issuedAt;
+
     private Instant expiresAt;
+
     private Boolean active = true;
 
-    @ManyToOne
+    @OneToOne
     private RoomBooking booking;
 
-    // getters setters
+    /* ========= getters & setters ========= */
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
