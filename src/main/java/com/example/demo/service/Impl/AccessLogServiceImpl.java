@@ -1,54 +1,84 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.*;
-import com.example.demo.repository.*;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.model.AccessLog;
+import com.example.demo.model.DigitalKey;
+import com.example.demo.model.Guest;
+import com.example.demo.repository.AccessLogRepository;
+import com.example.demo.repository.DigitalKeyRepository;
+import com.example.demo.repository.GuestRepository;
+import com.example.demo.repository.KeyShareRequestRepository;
 import com.example.demo.service.AccessLogService;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 
-@Service   // ✅ ADD THIS
+@Service
 public class AccessLogServiceImpl implements AccessLogService {
 
-    private final AccessLogRepository repo;
-    private final DigitalKeyRepository keyRepo;
-    private final GuestRepository guestRepo;
-    private final KeyShareRequestRepository shareRepo;
+    private final AccessLogRepository accessLogRepository;
+    private final DigitalKeyRepository digitalKeyRepository;
+    private final GuestRepository guestRepository;
+    private final KeyShareRequestRepository keyShareRequestRepository;
 
     public AccessLogServiceImpl(
-            AccessLogRepository repo,
-            DigitalKeyRepository keyRepo,
-            GuestRepository guestRepo,
-            KeyShareRequestRepository shareRepo) {
+            AccessLogRepository accessLogRepository,
+            DigitalKeyRepository digitalKeyRepository,
+            GuestRepository guestRepository,
+            KeyShareRequestRepository keyShareRequestRepository) {
 
-        this.repo = repo;
-        this.keyRepo = keyRepo;
-        this.guestRepo = guestRepo;
-        this.shareRepo = shareRepo;
+        this.accessLogRepository = accessLogRepository;
+        this.digitalKeyRepository = digitalKeyRepository;
+        this.guestRepository = guestRepository;
+        this.keyShareRequestRepository = keyShareRequestRepository;
     }
 
     @Override
     public AccessLog createLog(AccessLog log) {
 
-        if (log.getAccessTime().isAfter(Instant.now())) {
-            throw new IllegalArgumentException("future");
+        // ✅ REQUIRED FOR testAccessLogFutureTimeNegative
+        Instant now = Instant.now();
+        if (log.getAccessTime().isAfter(now)) {
+            throw new IllegalArgumentException("Access time cannot be in the future");
         }
 
-        DigitalKey key = keyRepo.findById(
-                log.getDigitalKey().getId()).orElseThrow();
+        DigitalKey key = digitalKeyRepository.findById(
+                log.getDigitalKey().getId()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException("Key not found")
+        );
 
-        log.setResult(key.getActive() ? "SUCCESS" : "DENIED");
-        return repo.save(log);
+        Guest guest = guestRepository.findById(
+                log.getGuest().getId()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException("Guest not found")
+        );
+
+        log.setDigitalKey(key);
+        log.setGuest(guest);
+
+        if (key.getActive() && now.isBefore(key.getExpiresAt())) {
+            log.setResult("SUCCESS");
+        } else {
+            log.setResult("DENIED");
+        }
+
+        return accessLogRepository.save(log);
     }
 
     @Override
     public List<AccessLog> getLogsForGuest(Long guestId) {
-        return repo.findByGuestId(guestId);
+        return accessLogRepository.findByGuestId(guestId);
     }
 
     @Override
     public List<AccessLog> getLogsForKey(Long keyId) {
-        return repo.findByDigitalKeyId(keyId);
+        return accessLogRepository.findByDigitalKeyId(keyId);
+    }
+
+    @Override
+    public List<AccessLog> getAllLogs() {
+        return accessLogRepository.findAll();
     }
 }
