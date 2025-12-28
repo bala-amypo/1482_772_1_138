@@ -8,55 +8,54 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service   // ✅ THIS WAS MISSING (LAST ONE)
+@Service
 public class RoomBookingServiceImpl implements RoomBookingService {
 
-    private final RoomBookingRepository repo;
+    private final RoomBookingRepository roomBookingRepository;
 
-    public RoomBookingServiceImpl(RoomBookingRepository repo) {
-        this.repo = repo;
+    // ✅ REQUIRED BY TESTS
+    public RoomBookingServiceImpl(RoomBookingRepository roomBookingRepository) {
+        this.roomBookingRepository = roomBookingRepository;
     }
 
     @Override
     public RoomBooking createBooking(RoomBooking booking) {
-
-        if (booking.getCheckInDate()
-                .isAfter(booking.getCheckOutDate())) {
-            throw new IllegalArgumentException("Check-in date must be before check-out date");
+        if (booking.getCheckOutDate().isBefore(booking.getCheckInDate())) {
+            throw new IllegalArgumentException("Check-in must be before check-out");
         }
-
-        booking.setActive(true);
-        return repo.save(booking);
-    }
-
-    @Override
-    public RoomBooking getBookingById(Long id) {
-        return repo.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Booking not found " + id));
-    }
-
-    @Override
-    public List<RoomBooking> getBookingsForGuest(Long guestId) {
-        return repo.findByGuestId(guestId);
+        return roomBookingRepository.save(booking);
     }
 
     @Override
     public RoomBooking updateBooking(Long id, RoomBooking booking) {
+        RoomBooking existing = roomBookingRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Booking not found: " + id));
 
-        RoomBooking existing = getBookingById(id);
-
-        existing.setRoomNumber(booking.getRoomNumber());
         existing.setCheckInDate(booking.getCheckInDate());
         existing.setCheckOutDate(booking.getCheckOutDate());
+        return roomBookingRepository.save(existing);
+    }
 
-        return repo.save(existing);
+    @Override
+    public List<RoomBooking> getBookingsForGuest(Long guestId) {
+        return roomBookingRepository.findByGuestId(guestId);
     }
 
     @Override
     public void deactivateBooking(Long id) {
-        RoomBooking booking = getBookingById(id);
+        RoomBooking booking = roomBookingRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Booking not found: " + id));
         booking.setActive(false);
-        repo.save(booking);
+        roomBookingRepository.save(booking);
+    }
+
+    // ✅ REQUIRED BY INTERFACE (LAST MISSING METHOD)
+    @Override
+    public RoomBooking getBookingById(Long id) {
+        return roomBookingRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Booking not found: " + id));
     }
 }

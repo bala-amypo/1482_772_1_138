@@ -9,52 +9,77 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service   // ✅ ADD THIS
+@Service
 public class GuestServiceImpl implements GuestService {
 
-    private final GuestRepository repo;
-    private final PasswordEncoder encoder;
+    private final GuestRepository guestRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public GuestServiceImpl(GuestRepository repo, PasswordEncoder encoder) {
-        this.repo = repo;
-        this.encoder = encoder;
+    // ✅ REQUIRED BY TESTS
+    public GuestServiceImpl(GuestRepository guestRepository,
+                            PasswordEncoder passwordEncoder) {
+        this.guestRepository = guestRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public Guest createGuest(Guest g) {
-        if (repo.existsByEmail(g.getEmail())) {
+    public Guest createGuest(Guest guest) {
+        if (guestRepository.existsByEmail(guest.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
-        g.setPassword(encoder.encode(g.getPassword()));
-        return repo.save(g);
+        guest.setPassword(passwordEncoder.encode(guest.getPassword()));
+        return guestRepository.save(guest);
     }
 
     @Override
     public Guest getGuestById(Long id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Guest not found " + id));
+        return guestRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Guest not found: " + id));
     }
 
     @Override
     public List<Guest> getAllGuests() {
-        return repo.findAll();
+        return guestRepository.findAll();
     }
 
     @Override
-    public Guest updateGuest(Long id, Guest g) {
-        Guest e = getGuestById(id);
-        e.setFullName(g.getFullName());
-        e.setPhoneNumber(g.getPhoneNumber());
-        e.setVerified(g.getVerified());
-        e.setActive(g.getActive());
-        e.setRole(g.getRole());
-        return repo.save(e);
+    public Guest updateGuest(Long id, Guest updated) {
+        Guest existing = getGuestById(id);
+        existing.setFullName(updated.getFullName());
+        existing.setPhoneNumber(updated.getPhoneNumber());
+        existing.setVerified(updated.getVerified());
+        existing.setActive(updated.getActive());
+        existing.setRole(updated.getRole());
+        return guestRepository.save(existing);
     }
 
     @Override
     public void deactivateGuest(Long id) {
-        Guest g = getGuestById(id);
-        g.setActive(false);
-        repo.save(g);
+        Guest guest = getGuestById(id);
+        guest.setActive(false);
+        guestRepository.save(guest);
+    }
+
+    // ✅ REQUIRED BY INTERFACE
+    @Override
+    public void deleteGuest(Long id) {
+        Guest guest = getGuestById(id);
+        guestRepository.delete(guest);
+    }
+
+    // ✅ REQUIRED BY INTERFACE (LAST MISSING METHOD)
+    @Override
+    public Guest loginGuest(String email, String password) {
+
+        Guest guest = guestRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Guest not found: " + email));
+
+        if (!passwordEncoder.matches(password, guest.getPassword())) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+
+        return guest;
     }
 }
