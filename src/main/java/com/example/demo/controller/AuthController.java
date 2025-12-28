@@ -1,7 +1,13 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.*;
 import com.example.demo.model.Guest;
+import com.example.demo.security.JwtTokenProvider;
+import com.example.demo.security.GuestPrincipal;
 import com.example.demo.service.GuestService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -9,21 +15,58 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final GuestService guestService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    // ✅ Constructor Injection
-    public AuthController(GuestService guestService) {
+    public AuthController(
+            GuestService guestService,
+            AuthenticationManager authenticationManager,
+            JwtTokenProvider jwtTokenProvider) {
         this.guestService = guestService;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    // ✅ REGISTER
     @PostMapping("/register")
-    public Guest register(@RequestBody Guest guest) {
-        return guestService.createGuest(guest);
+    public TokenResponse register(@RequestBody RegisterRequest request) {
+
+        Guest g = new Guest();
+        g.setFullName(request.getFullName());
+        g.setEmail(request.getEmail());
+        g.setPhoneNumber(request.getPhoneNumber());
+        g.setPassword(request.getPassword());
+        g.setRole(request.getRole() != null ? request.getRole() : "ROLE_USER");
+
+        Guest saved = guestService.createGuest(g);
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                saved.getEmail(),
+                request.getPassword()
+        );
+
+        String token = jwtTokenProvider.generateToken(auth);
+
+        return new TokenResponse(token, saved.getId(), saved.getEmail(), saved.getRole());
     }
 
-    // ✅ LOGIN (DUMMY TOKEN – SAFE)
     @PostMapping("/login")
-    public String login(@RequestBody Guest guest) {
-        return "dummy-token";
+    public TokenResponse login(@RequestBody LoginRequest request) {
+
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
+        GuestPrincipal principal = (GuestPrincipal) auth.getPrincipal();
+        String token = jwtTokenProvider.generateToken(auth);
+
+        return new TokenResponse(
+                token,
+                principal.getId(),
+                principal.getUsername(),
+                principal.getRole()
+        );
     }
 }
