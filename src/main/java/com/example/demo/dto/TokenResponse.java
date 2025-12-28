@@ -1,7 +1,21 @@
-package com.example.demo.exception;
+package com.example.demo.dto;
 
-public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(String message) {
-        super(message);
+public class TokenResponse {
+
+    private String token;
+
+    public TokenResponse() {
+    }
+
+    public TokenResponse(String token) {
+        this.token = token;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
