@@ -1,72 +1,54 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.*;
 import com.example.demo.model.Guest;
 import com.example.demo.security.JwtTokenProvider;
-import com.example.demo.security.GuestPrincipal;
 import com.example.demo.service.GuestService;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Endpoints for user registration and login")
 public class AuthController {
 
-    private final GuestService guestService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private GuestService guestService;
 
-    public AuthController(
-            GuestService guestService,
-            AuthenticationManager authenticationManager,
-            JwtTokenProvider jwtTokenProvider) {
-        this.guestService = guestService;
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;   // ✅ ADD THIS
 
     @PostMapping("/register")
-    public TokenResponse register(@RequestBody RegisterRequest request) {
-
-        Guest g = new Guest();
-        g.setFullName(request.getFullName());
-        g.setEmail(request.getEmail());
-        g.setPhoneNumber(request.getPhoneNumber());
-        g.setPassword(request.getPassword());
-        g.setRole(request.getRole() != null ? request.getRole() : "ROLE_USER");
-
-        Guest saved = guestService.createGuest(g);
-
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                saved.getEmail(),
-                request.getPassword()
-        );
-
-        String token = jwtTokenProvider.generateToken(auth);
-
-        return new TokenResponse(token, saved.getId(), saved.getEmail(), saved.getRole());
+    public ResponseEntity<Guest> register(@RequestBody Guest guest) {
+        return ResponseEntity.ok(guestService.createGuest(guest));
     }
 
     @PostMapping("/login")
-    public TokenResponse login(@RequestBody LoginRequest request) {
+    public ResponseEntity<Map<String, Object>> login(
+            @RequestBody Map<String, String> loginRequest) {
 
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
+        Guest guest = guestService.loginGuest(
+                loginRequest.get("email"),
+                loginRequest.get("password")
         );
 
-        GuestPrincipal principal = (GuestPrincipal) auth.getPrincipal();
-        String token = jwtTokenProvider.generateToken(auth);
-
-        return new TokenResponse(
-                token,
-                principal.getId(),
-                principal.getUsername(),
-                principal.getRole()
+        // ✅ REAL JWT TOKEN
+        String token = jwtTokenProvider.generateToken(
+                guest.getId(),
+                guest.getEmail(),
+                guest.getRole()
         );
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Login successful");
+        response.put("guestId", guest.getId());
+        response.put("email", guest.getEmail());
+        response.put("token", token);   // ✅ FIXED
+
+        return ResponseEntity.ok(response);
     }
 }

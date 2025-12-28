@@ -2,32 +2,39 @@ package com.example.demo.controller;
 
 import com.example.demo.model.AccessLog;
 import com.example.demo.service.AccessLogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/access-logs")
+@SecurityRequirement(name = "bearerAuth")
+
 public class AccessLogController {
 
-    private final AccessLogService service;
-
-    public AccessLogController(AccessLogService service) {
-        this.service = service;
-    }
+    @Autowired
+    private AccessLogService accessLogService;
 
     @PostMapping
-    public AccessLog create(@RequestBody AccessLog log) {
-        return service.createLog(log);
+    public ResponseEntity<AccessLog> recordEntry(@RequestBody AccessLog log) {
+        return ResponseEntity.ok(accessLogService.createLog(log));
     }
 
-    @GetMapping("/guest/{guestId}")
-    public List<AccessLog> getLogsForGuest(@PathVariable Long guestId) {
-        return service.getLogsForGuest(guestId);
+    @GetMapping
+    public ResponseEntity<List<AccessLog>> getAllLogs() {
+        return ResponseEntity.ok(accessLogService.getAllLogs());
     }
 
     @GetMapping("/key/{keyId}")
-    public List<AccessLog> getLogsForKey(@PathVariable Long keyId) {
-        return service.getLogsForKey(keyId);
+    public ResponseEntity<List<AccessLog>> getLogsByKey(@PathVariable Long keyId) {
+        return ResponseEntity.ok(accessLogService.getLogsForKey(keyId));
+    }
+
+    @GetMapping("/guest/{guestId}")
+    public ResponseEntity<List<AccessLog>> getLogsByGuest(@PathVariable Long guestId) {
+        return ResponseEntity.ok(accessLogService.getLogsForGuest(guestId));
     }
 }
