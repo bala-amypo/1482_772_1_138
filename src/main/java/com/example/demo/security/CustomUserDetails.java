@@ -1,61 +1,31 @@
 package com.example.demo.security;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.example.demo.model.Guest;
+import com.example.demo.repository.GuestRepository;
+import org.springframework.security.core.userdetails.*;
+import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
 
-public class CustomUserDetails implements UserDetails {
+    private final GuestRepository guestRepository;
 
-    private final Long id;
-    private final String email;
-    private final String password;
-    private final String role;
-
-    public CustomUserDetails(Long id, String email, String password, String role) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
-    public Long getId() {
-        return id;
+    public CustomUserDetailsService(GuestRepository guestRepository) {
+        this.guestRepository = guestRepository;
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(() -> role);
-    }
+    public UserDetails loadUserByUsername(String email)
+            throws UsernameNotFoundException {
 
-    @Override
-    public String getPassword() {
-        return password;
-    }
+        Guest guest = guestRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found: " + email));
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+        return User.builder()
+                .username(guest.getEmail())
+                .password(guest.getPassword())
+                .authorities(guest.getRole())
+                .build();
     }
 }
